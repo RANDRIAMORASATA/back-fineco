@@ -22,7 +22,7 @@ import { Investment } from './investments/investment.entity';
       password: process.env.DB_PASSWORD || 'fineco',
       database: process.env.DB_NAME || 'mvp_fineco',
       entities: [User, Project, Investment],
-      synchronize: true, // seulement pour dev
+      synchronize: false, 
     }),
     UsersModule,
     AuthModule,

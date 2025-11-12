@@ -6,15 +6,43 @@ import { User } from '../users/user.entity';
 
 @Injectable()
 export class ProjectsService {
-  constructor(@InjectRepository(Project) private repo:Repository<Project>){}
+  constructor(@InjectRepository(Project) private repo: Repository<Project>) {}
 
-  create(data:Partial<Project>, owner:User){
-    const p = this.repo.create({...data, owner});
-    return this.repo.save(p);
+  // Créer un projet
+  async create(data: Partial<Project>, owner: User) {
+    const project = this.repo.create({ ...data, owner });
+    return this.repo.save(project);
   }
 
-  findAllPublished(){ return this.repo.find({where:{published:true}, relations:['owner']}); }
-  findByOwner(ownerId:number){ return this.repo.find({where:{owner:{id:ownerId}}, relations:['owner']}); }
-  findById(id:number){ return this.repo.findOne({where:{id}, relations:['owner']}); }
-  update(id:number, data:Partial<Project>){ return this.repo.update(id, data); }
+  // Tous les projets
+  findAll() {
+    return this.repo.find({ relations: ['owner'] });
+  }
+
+  // Tous les projets publiés
+  findAllPublished() {
+    return this.repo.find({ where: { published: true }, relations: ['owner'] });
+  }
+
+  // Projets par owner
+  findByOwner(ownerId: number) {
+    return this.repo.find({ where: { owner: { id: ownerId } }, relations: ['owner'] });
+  }
+
+  // Projet par ID
+  findById(id: number) {
+    return this.repo.findOne({ where: { id }, relations: ['owner'] });
+  }
+
+  // Mettre à jour un projet
+  async update(id: number, data: Partial<Project>) {
+    await this.repo.update(id, data);
+    return this.findById(id);
+  }
+
+  //delete
+  delete(id: number) {
+    return this.repo.delete(id);
+  }
+
 }

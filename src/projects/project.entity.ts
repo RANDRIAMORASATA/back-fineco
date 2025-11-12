@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from '../users/user.entity';
 
 @Entity()
@@ -9,12 +9,15 @@ export class Project {
   @Column()
   title: string;
 
-  @Column()
+  @Column('text',{nullable:true})
   description: string;
 
-  @Column({ default: 'draft' })
-  status: 'draft' | 'published';
+  @Column({default:false})
+  published: boolean;
 
-  @ManyToOne(() => User, user => user.projects)
+  @Column({type:'float', default:0})
+  goal_amount: number;
+
+  @ManyToOne(() => User, u => u.projects, {nullable:false})
   owner: User;
 }

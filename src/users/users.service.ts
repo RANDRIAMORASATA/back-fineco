@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { User } from './user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
+import { Injectable } from "@nestjs/common";
+import { User } from "./user.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import * as bcrypt from 'bcrypt'; 
 
 @Injectable()
 export class UsersService {
@@ -11,14 +11,45 @@ export class UsersService {
     private usersRepo: Repository<User>
   ) {}
 
-  async create(email:string, password:string, role:'investor'|'creator', name?:string){
+  async create(email: string, password: string, role: 'investor' | 'creator', name?: string) {
     const hash = await bcrypt.hash(password, 10);
-    const user = this.usersRepo.create({email, password:hash, role, name});
+    const user = this.usersRepo.create({ email, password: hash, role, name });
     return this.usersRepo.save(user);
   }
 
-  findByEmail(email:string){ return this.usersRepo.findOne({where:{email}}); }
-  findById(id:number){ return this.usersRepo.findOne({where:{id}}); }
-  async update(id:number, data:Partial<User>){ await this.usersRepo.update(id, data); return this.findById(id); }
-  async delete(id:number){ return this.usersRepo.delete(id); }
+  findByEmail(email: string) {
+    return this.usersRepo.findOne({ where: { email } });
+  }
+
+  findById(id: number) {
+    return this.usersRepo.findOne({ where: { id } });
+  }
+
+
+async update(id: number, data: Partial<User>) {
+  const user = await this.findById(id);
+  if (!user) throw new Error('User not found');
+
+  delete data.role; // on ne modifie pas le rôle
+
+  // Vérifie si l'email existe déjà pour un autre utilisateur
+  if (data.email && data.email !== user.email) {
+    const existing = await this.findByEmail(data.email);
+    if (existing && existing.id !== id) {
+      throw new Error('Email already in use');
+    }
+  }
+
+  await this.usersRepo.update(id, data);
+  return this.findById(id);
+}
+
+
+
+
+  async delete(id: number) {
+    const user = await this.findById(id);
+    if (!user) throw new Error('User not found');
+    return this.usersRepo.delete(id);
+  }
 }

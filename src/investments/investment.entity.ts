@@ -1,18 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Project } from '../projects/project.entity';
 
 @Entity()
 export class Investment {
   @PrimaryGeneratedColumn()
-  id: number;
+  id:number;
 
-  @ManyToOne(() => User, user => user.investments)
+  @ManyToOne(() => User, u => u.investments, {nullable:false})
   investor: User;
 
-  @ManyToOne(() => Project)
+  @ManyToOne(() => Project, {nullable:false})
   project: Project;
 
-  @Column()
-  amount: number; 
+  @Column({type:'float', default:0})
+  amount: number;
+
+  @Column({nullable:true})
+  txId: string;
 }

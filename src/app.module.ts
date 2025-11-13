@@ -10,6 +10,8 @@ import { InvestmentsModule } from './investments/investments.module';
 import { User } from './users/user.entity';
 import { Project } from './projects/project.entity';
 import { Investment } from './investments/investment.entity';
+import { HederaModule } from './hedera/hedera.module';
+
 
 @Module({
   imports: [
@@ -22,12 +24,13 @@ import { Investment } from './investments/investment.entity';
       password: process.env.DB_PASSWORD || 'fineco',
       database: process.env.DB_NAME || 'mvp_fineco',
       entities: [User, Project, Investment],
-      synchronize: false, 
+      synchronize: true, 
     }),
     UsersModule,
     AuthModule,
     ProjectsModule,
     InvestmentsModule,
+    HederaModule,
   ],
 })
 export class AppModule {}

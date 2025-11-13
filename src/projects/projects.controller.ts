@@ -44,4 +44,24 @@ export class ProjectsController {
   remove(@Param('id') id: number) {
     return this.projects.delete(Number(id));
   }
+  @Get('invested/:id')
+  findInvested(@Param('id') id: number) {
+    return this.projects.findByInvestor(Number(id));
+  }
+
+  @Post(':id/invest')
+  async invest(
+    @Param('id') id: number,
+    @Body() body: { investorId: number; amount: number }
+  ) {
+    const { investorId, amount } = body;
+    return this.projects.invest(id, investorId, amount);
+  }
+
+
+
+
+  
 }
+
+

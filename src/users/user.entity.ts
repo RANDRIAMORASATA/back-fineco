@@ -19,6 +19,13 @@ export class User {
   @Column({nullable:true})
   name: string;
 
+  @Column({ nullable: true })
+  hederaAccountId: string;
+
+  @Column({nullable:true})
+  hederaPrivateKey: string;
+
+
   @OneToMany(() => Project, p => p.owner)
   projects: Project[];
 

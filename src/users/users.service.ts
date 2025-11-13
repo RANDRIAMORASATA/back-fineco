@@ -3,12 +3,15 @@ import { User } from "./user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as bcrypt from 'bcrypt'; 
+import { HederaService } from '../hedera/hedera.service'; //
+import { CreateUserDto } from './create-user.dto'; 
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepo: Repository<User>
+    private usersRepo: Repository<User>,
+    private hederaService: HederaService,
   ) {}
 
   async create(email: string, password: string, role: 'investor' | 'creator', name?: string) {
@@ -52,4 +55,18 @@ async update(id: number, data: Partial<User>) {
     if (!user) throw new Error('User not found');
     return this.usersRepo.delete(id);
   }
+
+  async createCreator(userDto: CreateUserDto) {
+  const user = this.usersRepo.create(userDto);
+
+  // Si rôle = creator, créer un compte Hedera
+  if (user?.role === 'creator') {
+    const { accountId, privateKey } = await this.hederaService.createHederaAccount();
+    user.hederaAccountId = accountId;
+    user.hederaPrivateKey = privateKey;
+  }
+
+  return this.usersRepo.save(user);
+}
+
 }
